@@ -1,7 +1,10 @@
 package com.springsecurity.learn_spring_security.controllers;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,8 +16,8 @@ public class TodoController {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final List<Todo> TODOS_LIST =
-            List.of(new Todo("User", "Learn Spring"),
-            new Todo("User1", "Learn Spring Security"));
+            List.of(new Todo("spring", "Learn Spring"),
+            new Todo("admin", "Learn Spring Security"));
 
     @GetMapping("/todos")
     public List<Todo> getAllTodos() {
@@ -22,9 +25,12 @@ public class TodoController {
     }
 
     @GetMapping("/users/{username}/todos")
-    public List<Todo> getTodosByUser(@PathVariable("username") String username) {
+//    @PreAuthorize("hasRole('USER') and #username == authentication.principal.username")
+//    @PostAuthorize("returnObject.username == 'admin'")
+//    @RolesAllowed({"ADMIN", "USER"})
+    public Todo getTodosByUser(@PathVariable("username") String username) {
         Predicate<? super Todo> predicate = todo -> todo.username().equals(username);
-        return TODOS_LIST.stream().filter(predicate).toList();
+        return TODOS_LIST.stream().filter(predicate).toList().get(0);
     }
 
     @PostMapping("/users/{username}/todos")

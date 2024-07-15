@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -19,7 +20,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
 
-//@Configuration
+@Configuration
+//@EnableMethodSecurity(jsr250Enabled = true)
 public class BasicAuthSecurityConfiguration {
 
     /**
@@ -32,7 +34,10 @@ public class BasicAuthSecurityConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 auth -> {
-                    auth.anyRequest().authenticated();
+                    auth
+                            //Allows requests to a specific resource with a specific role
+                            .requestMatchers("/hello-world").hasRole("ADMIN")
+                            .anyRequest().authenticated();
                 });
 
         http.sessionManagement(
